@@ -22,9 +22,7 @@
       outline: none; background: #fff; color: #1a1a1a;
       font-family: inherit;
     }
-    input[type=text]:focus, input[type=password]:focus, textarea:focus {
-      border-color: #666;
-    }
+    input[type=text]:focus, input[type=password]:focus, textarea:focus { border-color: #666; }
     .btn {
       width: 100%; padding: 12px; border-radius: 8px;
       font-size: 16px; font-weight: 500; cursor: pointer;
@@ -32,35 +30,30 @@
     }
     .btn-primary { background: #1a1a1a; color: #fff; }
     .btn-primary:hover { background: #333; }
-    .btn-secondary {
-      background: transparent; border: 0.5px solid #ccc;
-      color: #1a1a1a; margin-top: 8px;
-    }
+    .btn-secondary { background: transparent; border: 0.5px solid #ccc; color: #1a1a1a; margin-top: 8px; }
     .btn-secondary:hover { background: #f5f5f5; }
     .btn:active { transform: scale(0.98); }
-    .seat-result {
-      background: #f0faf4; border: 0.5px solid #86efac;
-      border-radius: 12px; padding: 20px; margin-bottom: 12px;
-    }
+    .seat-result { background: #f0faf4; border: 0.5px solid #86efac; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
     .seat-block { padding: 12px 0; border-bottom: 0.5px solid #86efac; }
     .seat-block:last-child { border-bottom: none; }
     .seat-label { font-size: 12px; color: #16a34a; font-weight: 500; margin-bottom: 2px; }
     .seat-num { font-size: 28px; font-weight: 500; color: #1a1a1a; }
     .seat-tbd { font-size: 16px; color: #666; }
     .person-name { font-size: 14px; color: #666; margin-bottom: 12px; }
-    .error-card {
-      background: #fef2f2; border: 0.5px solid #fca5a5;
-      border-radius: 12px; padding: 16px; margin-bottom: 12px;
-      color: #dc2626; font-size: 14px; line-height: 1.6;
-    }
+    .error-card { background: #fef2f2; border: 0.5px solid #fca5a5; border-radius: 12px; padding: 16px; margin-bottom: 12px; color: #dc2626; font-size: 14px; line-height: 1.6; }
+    .multi-result { margin-bottom: 12px; }
+    .multi-item { background: #fff; border: 0.5px solid #e0e0e0; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .multi-item:hover { background: #f5f5f0; }
+    .multi-item-name { font-size: 15px; font-weight: 500; color: #1a1a1a; }
+    .multi-item-kana { font-size: 12px; color: #888; margin-top: 2px; }
+    .multi-item-arrow { color: #aaa; font-size: 18px; }
+    .multi-label { font-size: 13px; color: #666; margin-bottom: 8px; }
+    .back-link { font-size: 13px; color: #2563eb; cursor: pointer; margin-bottom: 12px; display: inline-block; }
     .nav-link { text-align: center; padding: 8px; font-size: 13px; color: #2563eb; cursor: pointer; margin-top: 8px; }
     .nav-link:hover { text-decoration: underline; }
     .hint { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.6; }
     .admin-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-    .admin-badge {
-      background: #fefce8; color: #854d0e; font-size: 11px;
-      padding: 2px 8px; border-radius: 20px; border: 0.5px solid #fde68a;
-    }
+    .admin-badge { background: #fefce8; color: #854d0e; font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 0.5px solid #fde68a; }
     .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .stat { background: #f5f5f0; border-radius: 8px; padding: 12px; text-align: center; }
     .stat-num { font-size: 22px; font-weight: 500; color: #1a1a1a; }
@@ -82,7 +75,7 @@
       <div class="label">社員番号 / 氏名 / フリガナ</div>
       <input type="text" id="search-input" placeholder="例：10000 / 山田花子 / ヤマダハナコ" oninput="clearResult()" />
       <button class="btn btn-primary" onclick="searchSeat()">座席を確認する</button>
-      <div class="hint">・半角数字で社員番号<br>・漢字・ひらがな・カタカナすべて対応</div>
+      <div class="hint">・半角数字で社員番号<br>・漢字・カタカナは部分一致で検索できます</div>
     </div>
     <div id="result-area"></div>
     <div class="nav-link" onclick="showScreen('s-admin-login')">主催者の方はこちら</div>
@@ -175,16 +168,17 @@ let sheetData = [
 ];
 
 function normalize(s) {
-  return s.replace(/\s/g, '').toLowerCase()
-    .replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+  return s.replace(/\s/g, '');
 }
 
-function findPerson(q) {
+function searchPeople(q) {
   const nq = normalize(q);
-  return sheetData.find(d =>
-    d.id === q ||
-    normalize(d.name) === nq ||
-    normalize(d.kana) === nq
+  if (/^\d+$/.test(q)) {
+    return sheetData.filter(d => d.id === q);
+  }
+  return sheetData.filter(d =>
+    normalize(d.name).includes(nq) ||
+    normalize(d.kana).includes(nq)
   );
 }
 
@@ -193,30 +187,59 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
+function renderSeatResult(person) {
+  const secondHtml = person.second
+    ? `<div class="seat-num">${person.second}</div>`
+    : `<div class="seat-tbd">後日お知らせします</div>`;
+  return `
+    <div class="seat-result">
+      <div class="person-name">${person.name}（${person.kana}）</div>
+      <div class="seat-block">
+        <div class="seat-label">前半</div>
+        <div class="seat-num">${person.first}</div>
+      </div>
+      <div class="seat-block">
+        <div class="seat-label">後半</div>
+        ${secondHtml}
+      </div>
+    </div>`;
+}
+
 function searchSeat() {
   const q = document.getElementById('search-input').value.trim();
   const area = document.getElementById('result-area');
   if (!q) { area.innerHTML = ''; return; }
-  const found = findPerson(q);
-  if (found) {
-    const secondHtml = found.second
-      ? `<div class="seat-num">${found.second}</div>`
-      : `<div class="seat-tbd">後日お知らせします</div>`;
-    area.innerHTML = `
-      <div class="seat-result">
-        <div class="person-name">${found.name}（${found.kana}）</div>
-        <div class="seat-block">
-          <div class="seat-label">前半</div>
-          <div class="seat-num">${found.first}</div>
-        </div>
-        <div class="seat-block">
-          <div class="seat-label">後半</div>
-          ${secondHtml}
-        </div>
-      </div>`;
-  } else {
+
+  const results = searchPeople(q);
+
+  if (results.length === 0) {
     area.innerHTML = `<div class="error-card">見つかりませんでした。<br>社員番号・氏名・フリガナをご確認ください。</div>`;
+  } else if (results.length === 1) {
+    area.innerHTML = renderSeatResult(results[0]);
+  } else {
+    const items = results.map((p, i) => `
+      <div class="multi-item" onclick="selectPerson(${i})">
+        <div>
+          <div class="multi-item-name">${p.name}</div>
+          <div class="multi-item-kana">${p.kana}　社員番号：${p.id}</div>
+        </div>
+        <div class="multi-item-arrow">›</div>
+      </div>`).join('');
+    area.innerHTML = `
+      <div class="multi-result">
+        <div class="multi-label">${results.length}件見つかりました。お名前を選んでください：</div>
+        ${items}
+      </div>`;
+    window._multiResults = results;
   }
+}
+
+function selectPerson(index) {
+  const area = document.getElementById('result-area');
+  const person = window._multiResults[index];
+  area.innerHTML = `
+    <span class="back-link" onclick="searchSeat()">← 検索結果に戻る</span>
+    ${renderSeatResult(person)}`;
 }
 
 function clearResult() { document.getElementById('result-area').innerHTML = ''; }
@@ -262,10 +285,14 @@ function testSearch() {
   const q = document.getElementById('test-input').value.trim();
   const res = document.getElementById('test-result');
   if (!q) { res.textContent = ''; return; }
-  const found = findPerson(q);
-  res.innerHTML = found
-    ? `<span style="color:#16a34a;">✓ ${found.name}　前半：${found.first}　後半：${found.second || '未設定'}</span>`
-    : `<span style="color:#dc2626;">見つかりません</span>`;
+  const results = searchPeople(q);
+  if (results.length === 0) {
+    res.innerHTML = `<span style="color:#dc2626;">見つかりません</span>`;
+  } else {
+    res.innerHTML = results.map(p =>
+      `<div style="color:#16a34a; margin-bottom:4px;">✓ ${p.name}　前半：${p.first}　後半：${p.second || '未設定'}</div>`
+    ).join('');
+  }
 }
 
 document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchSeat(); });
