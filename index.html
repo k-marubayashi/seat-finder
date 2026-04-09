@@ -59,8 +59,8 @@
     .stat-num { font-size: 22px; font-weight: 500; color: #1a1a1a; }
     .stat-label { font-size: 12px; color: #666; margin-top: 2px; }
     .section-title { font-size: 13px; font-weight: 500; color: #666; margin-bottom: 8px; }
-    .btn-venue { width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: 2px solid #C8A84B; background: #F5E8C0; color: #5C3A0A; margin-top: 10px; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-venue:hover { background: #EDD98A; border-color: #A8882B; color: #3A2506; }
+    .btn-venue { width: 100%; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: 2px solid #5C1A2E; background: #F5E8C0; color: #5C3A0A; margin-top: 10px; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-venue:hover { background: #EDD98A; border-color: #3D0F1E; color: #3A2506; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
     .modal-overlay.open { display: flex; }
     .modal { background: #fff; border-radius: 12px; width: 100%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
@@ -114,7 +114,13 @@
     </div>
     <div class="card">
       <div class="label">パスワード</div>
-      <input type="password" id="pw-input" placeholder="パスワードを入力" />
+      <div style="position:relative;">
+        <input type="password" id="pw-input" placeholder="パスワードを入力" style="padding-right:44px;" />
+        <button onclick="togglePw()" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#888;font-size:18px;line-height:1;" id="pw-toggle">
+          <svg id="pw-eye" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1 10C1 10 4 4 10 4C16 4 19 10 19 10C19 10 16 16 10 16C4 16 1 10 1 10Z" stroke="#888" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="#888" stroke-width="1.5"/></svg>
+          <svg id="pw-eye-off" width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:none;"><path d="M1 10C1 10 4 4 10 4C16 4 19 10 19 10C19 10 16 16 10 16C4 16 1 10 1 10Z" stroke="#888" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="#888" stroke-width="1.5"/><line x1="3" y1="3" x2="17" y2="17" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
       <button class="btn btn-primary" onclick="adminLogin()">ログイン</button>
       <button class="btn btn-secondary" onclick="showScreen('s-participant')">← 参加者画面に戻る</button>
     </div>
@@ -383,6 +389,21 @@ function testSearch() {
     res.innerHTML = results.map(p =>
       `<div style="color:#16a34a; margin-bottom:4px;">✓ ${p.name}　前半：${p.first}　後半：${p.second || '未設定'}</div>`
     ).join('');
+  }
+}
+
+function togglePw() {
+  const input = document.getElementById('pw-input');
+  const eye = document.getElementById('pw-eye');
+  const eyeOff = document.getElementById('pw-eye-off');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eye.style.display = 'none';
+    eyeOff.style.display = 'block';
+  } else {
+    input.type = 'password';
+    eye.style.display = 'block';
+    eyeOff.style.display = 'none';
   }
 }
 
