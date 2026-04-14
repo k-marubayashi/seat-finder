@@ -168,7 +168,7 @@
 </div>
 
 <script>
-let searchEnabled = true;
+let searchEnabled = false;
 const ADMIN_PASSWORDS = ['Award2026'];
 
 let sheetData = [
@@ -789,6 +789,7 @@ function adminLogin() {
   if (ADMIN_PASSWORDS.includes(pw)) {
     err.innerHTML = '';
     updateStats();
+    updateSearchToggleUI();
     showScreen('s-admin-dash');
   } else {
     err.innerHTML = '<div class="error-card">パスワードが正しくありません</div>';
@@ -836,8 +837,14 @@ function testSearch() {
 
 function toggleSearch() {
   searchEnabled = !searchEnabled;
+  localStorage.setItem("searchEnabled", searchEnabled);
+  updateSearchToggleUI();
+}
+
+function updateSearchToggleUI() {
   const btn = document.getElementById('toggle-search-btn');
   const txt = document.getElementById('search-status-text');
+  if (!btn || !txt) return;
   if (searchEnabled) {
     btn.textContent = '終了にする';
     btn.style.background = '#5C1A2E';
