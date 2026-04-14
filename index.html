@@ -168,6 +168,7 @@
 </div>
 
 <script>
+let searchEnabled = true;
 const ADMIN_PASSWORDS = ['Award2026'];
 
 let sheetData = [
@@ -743,6 +744,10 @@ function searchSeat() {
   const q = document.getElementById('search-input').value.trim();
   const area = document.getElementById('result-area');
   if (!q) { area.innerHTML = ''; return; }
+  if (!searchEnabled) {
+    area.innerHTML = '<div class="error-card">検索期間は終了しました。</div>';
+    return;
+  }
 
   const results = searchPeople(q);
 
@@ -826,6 +831,21 @@ function testSearch() {
     res.innerHTML = results.map(p =>
       `<div style="color:#16a34a; margin-bottom:4px;">✓ ${p.name}　前半：${p.first}　後半：${p.second || '未設定'}</div>`
     ).join('');
+  }
+}
+
+function toggleSearch() {
+  searchEnabled = !searchEnabled;
+  const btn = document.getElementById('toggle-search-btn');
+  const txt = document.getElementById('search-status-text');
+  if (searchEnabled) {
+    btn.textContent = '終了にする';
+    btn.style.background = '#5C1A2E';
+    txt.textContent = '現在：受付中';
+  } else {
+    btn.textContent = '受付を再開する';
+    btn.style.background = '#888';
+    txt.textContent = '現在：終了中';
   }
 }
 
